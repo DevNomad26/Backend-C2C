@@ -1,16 +1,28 @@
 import express from 'express';
-import {env} from './config/env'
+import { env } from './config/env';
+import prisma from './config/db';
+
 const app = express();
-const PORT = env.PORT || 5000;
 
 app.use(express.json());
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', 
-    message: 'Coding Club API is running',
-    environment: env.NODE_ENV });
+app.get('/health', async (_req, res) => {
+  try { 
+    //just checks the connection works
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ 
+      status: 'ok', 
+      message: 'C2C API is running',
+      database: 'connected'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error', 
+      database: 'disconnected' 
+    });
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(env.PORT, () => {
+  console.log(`Server running on http://localhost:${env.PORT}`);
 });

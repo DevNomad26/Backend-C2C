@@ -9,6 +9,7 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().url(),
   ALLOWED_EMAIL_DOMAIN: z.string().min(1),
   JWT_SECRET: z.string().min(10),
+  DATABASE_URL: z.string().min(1),
 });
 
 
