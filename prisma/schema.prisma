@@ -23,6 +23,35 @@ model User {
   bio       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sessionsCreated Session[]
 
   @@map("users")
+}
+
+enum YearTarget {
+  FIRST
+  SECOND
+  THIRD
+  FOURTH
+  ALL
+}
+
+model Session {
+  id            String     @id @default(uuid())
+  title         String
+  speakerName   String
+  speakerBio    String?
+  description   String
+  date          DateTime
+  venue         String
+  recordingUrl  String?
+  slidesUrl     String?
+  tags          String[]
+  yearTarget    YearTarget @default(ALL)
+  createdBy     String
+  creator       User       @relation(fields: [createdBy], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@map("sessions")
 }
