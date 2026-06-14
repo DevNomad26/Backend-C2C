@@ -25,11 +25,13 @@ model User {
   updatedAt DateTime @updatedAt
   sessionsCreated Session[]
   hackerrankUsername String? @unique
+
   contestsCreated    Contest[]
   leaderboardEntries LeaderboardEntry[]
   campsCreated Camp[]
   hackathonsCreated Hackathon[]
   teamMemberships   TeamMember[]
+  registrations Registration[]
 
   @@map("users")
 }
@@ -114,6 +116,7 @@ model Camp {
   creator     User       @relation(fields: [createdBy], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  registrations Registration[]
 
   @@map("camps")
 }
@@ -138,6 +141,7 @@ model Hackathon {
 
   teams HackathonTeam[]
   teamMembers TeamMember[]
+  registrations Registration[]
 
   @@map("hackathons")
 }
@@ -171,3 +175,27 @@ model TeamMember {
   @@unique([userId, hackathonId])
   @@map("team_members")
 }
+
+enum EventType {
+  CAMP
+  HACKATHON
+}
+
+model Registration {
+  id           String    @id @default(uuid())
+  userId       String
+  eventType    EventType
+  registeredAt DateTime  @default(now())
+
+  campId      String?
+  hackathonId String?
+
+  user      User       @relation(fields: [userId], references: [id])
+  camp      Camp?      @relation(fields: [campId], references: [id])
+  hackathon Hackathon? @relation(fields: [hackathonId], references: [id])
+
+  @@unique([userId, campId])
+  @@unique([userId, hackathonId])
+  @@map("registrations")
+}
+
