@@ -32,6 +32,9 @@ model User {
   hackathonsCreated Hackathon[]
   teamMemberships   TeamMember[]
   registrations Registration[]
+  forumPosts    ForumPost[]
+  forumComments ForumComment[]
+  upvotes       Upvote[]
 
   @@map("users")
 }
@@ -199,3 +202,50 @@ model Registration {
   @@map("registrations")
 }
 
+model ForumPost {
+  id          String   @id @default(uuid())
+  authorId    String
+  title       String
+  content     String
+  tags        String[]
+  upvoteCount Int      @default(0)
+  isDeleted   Boolean  @default(false)
+  isPinned    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  imageUrls String[]
+  
+  author   User           @relation(fields: [authorId], references: [id])
+  comments ForumComment[]
+  upvotes  Upvote[]
+
+  @@map("forum_posts")
+}
+
+model ForumComment {
+  id        String   @id @default(uuid())
+  postId    String
+  authorId  String
+  content   String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   ForumPost @relation(fields: [postId], references: [id])
+  author User      @relation(fields: [authorId], references: [id])
+
+  @@map("forum_comments")
+}
+
+model Upvote {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User      @relation(fields: [userId], references: [id])
+  post ForumPost @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+  @@map("upvotes")
+}
