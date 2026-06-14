@@ -27,6 +27,9 @@ model User {
   hackerrankUsername String? @unique
   contestsCreated    Contest[]
   leaderboardEntries LeaderboardEntry[]
+  campsCreated Camp[]
+  hackathonsCreated Hackathon[]
+  teamMemberships   TeamMember[]
 
   @@map("users")
 }
@@ -90,4 +93,81 @@ model LeaderboardEntry {
 
   @@unique([userId, contestId])
   @@map("leaderboard_entries")
+}
+
+enum CampType {
+  WINTER
+  SUMMER
+}
+
+model Camp {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  type        CampType
+  startDate   DateTime
+  endDate     DateTime
+  venue       String?
+  maxSeats    Int?
+  tags        String[]
+  createdBy   String
+  creator     User       @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("camps")
+}
+
+
+model Hackathon {
+  id                 String   @id @default(uuid())
+  title              String
+  description        String
+  problemStatement   String
+  rules              String?
+  prizes             String?
+  regDeadline        DateTime
+  submissionDeadline DateTime
+  maxTeamSize        Int      @default(4)
+  minTeamSize        Int      @default(1)
+  tags               String[]
+  createdBy          String
+  creator            User     @relation(fields: [createdBy], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  teams HackathonTeam[]
+  teamMembers TeamMember[]
+
+  @@map("hackathons")
+}
+
+model HackathonTeam {
+  id            String    @id @default(uuid())
+  hackathonId   String
+  teamName      String
+  submissionUrl String?
+  repoUrl       String?
+  score         Int?
+  submittedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  hackathon Hackathon    @relation(fields: [hackathonId], references: [id])
+  members   TeamMember[]
+
+  @@map("hackathon_teams")
+}
+
+model TeamMember {
+  id          String @id @default(uuid())
+  teamId      String
+  userId      String
+  hackathonId String
+
+  team      HackathonTeam @relation(fields: [teamId], references: [id])
+  user      User          @relation(fields: [userId], references: [id])
+  hackathon Hackathon     @relation(fields: [hackathonId], references: [id])
+
+  @@unique([userId, hackathonId])
+  @@map("team_members")
 }
