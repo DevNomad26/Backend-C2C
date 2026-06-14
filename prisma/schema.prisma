@@ -64,6 +64,8 @@ model Session {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
+  calendarEvent CalendarEvent?
+
   @@map("sessions")
 }
 
@@ -81,6 +83,7 @@ model Contest {
   updatedAt      DateTime   @updatedAt
 
   leaderboardEntries LeaderboardEntry[]
+  calendarEvent CalendarEvent?
 
   @@map("contests")
 }
@@ -120,6 +123,7 @@ model Camp {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   registrations Registration[]
+  calendarEvent CalendarEvent?
 
   @@map("camps")
 }
@@ -145,6 +149,7 @@ model Hackathon {
   teams HackathonTeam[]
   teamMembers TeamMember[]
   registrations Registration[]
+  calendarEvent CalendarEvent?
 
   @@map("hackathons")
 }
@@ -182,6 +187,8 @@ model TeamMember {
 enum EventType {
   CAMP
   HACKATHON
+  SESSION
+  CONTEST
 }
 
 model Registration {
@@ -214,7 +221,7 @@ model ForumPost {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   imageUrls String[]
-  
+
   author   User           @relation(fields: [authorId], references: [id])
   comments ForumComment[]
   upvotes  Upvote[]
@@ -248,4 +255,26 @@ model Upvote {
 
   @@unique([userId, postId])
   @@map("upvotes")
+}
+
+
+model CalendarEvent {
+  id         String     @id @default(uuid())
+  title      String
+  eventType  EventType
+  date       DateTime
+  endDate    DateTime?
+  yearTarget YearTarget @default(ALL)
+
+  sessionId   String?   @unique
+  contestId   String?   @unique
+  campId      String?   @unique
+  hackathonId String?   @unique
+
+  session   Session?   @relation(fields: [sessionId], references: [id])
+  contest   Contest?   @relation(fields: [contestId], references: [id])
+  camp      Camp?      @relation(fields: [campId], references: [id])
+  hackathon Hackathon? @relation(fields: [hackathonId], references: [id])
+
+  @@map("calendar_events")
 }
