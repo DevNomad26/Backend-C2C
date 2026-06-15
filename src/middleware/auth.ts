@@ -56,3 +56,23 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
 
   next();
 };
+
+// Optional auth — attaches user if token exists, but doesn't reject if missing
+export const optionalAuthenticate = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies?.token;
+
+  if (!token) {
+    // no token — just continue without user
+    return next();
+  }
+
+  try {
+    const payload = verifyToken(token);
+    req.user = payload as any;
+  } catch {
+    // invalid token — just continue without user
+    // don't reject — it's optional
+  }
+
+  next();
+};

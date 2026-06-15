@@ -7,6 +7,7 @@ import authRouter from './routes/auth'
 import sessionRouter from './routes/session';
 import contestRouter from './routes/contest';
 import campRouter from './routes/camp';
+import hackathonRouter from './routes/hackathon';
 
 const app = express();
 
@@ -14,6 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
+app.use('/api/hackathons', hackathonRouter);
 
 //routes
 app.use('/api/auth', authRouter);
