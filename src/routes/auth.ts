@@ -2,7 +2,7 @@ import { Router } from 'express';
 import passport from '../config/passport';
 import { signToken,verifyToken} from '../utils/jwt';
 import { env } from '../config/env';
-
+import prisma from '../config/db';
 const router = Router();
 
 //user hits this route, gets redirected to Google
@@ -27,7 +27,7 @@ router.get(
     const token = signToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role
     });
 
     res.cookie('token', token, {
@@ -50,7 +50,7 @@ router.post('/logout', (req, res) => {
 
 
 //getting jwt payload of logged in users
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   const token = req.cookies?.token;
 
   if (!token) {
@@ -59,7 +59,25 @@ router.get('/me', (req, res) => {
 
   try {
     const payload = verifyToken(token);
-    res.json({ success: true, data: payload });
+    
+    // fetch fresh user data from DB
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        avatarUrl: true,
+        isProfileComplete: true,
+      }
+    });
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'User not found' });
+    }
+
+    res.json({ success: true, data: user });
   } catch {
     res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }

@@ -25,7 +25,7 @@ export const getCampById = async (id: string, includeRegistrations = false) => {
         ? {
             include: {
               user: {
-                select: { id: true, name: true, email: true, avatarUrl: true, year: true },
+                select: { id: true, name: true, email: true, avatarUrl: true, year: true, phone: true },
               },
             },
             orderBy: { registeredAt: 'desc' },

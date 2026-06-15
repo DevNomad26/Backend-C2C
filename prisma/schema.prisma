@@ -21,6 +21,8 @@ model User {
   role      Role     @default(MEMBER)
   year      Int
   bio       String?
+  phone     String?  @unique
+  isProfileComplete Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sessionsCreated Session[]

@@ -37,7 +37,8 @@ passport.use(
               email,
               name: profile.displayName,
               avatarUrl: profile.photos?.[0]?.value,
-              year: 1, // default to year 1
+              year: 1,
+              isProfileComplete: false,
             },
           });
         }
