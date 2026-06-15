@@ -161,12 +161,13 @@ model HackathonTeam {
   id            String    @id @default(uuid())
   hackathonId   String
   teamName      String
+  joinCode      String    @unique
   submissionUrl String?
   repoUrl       String?
   score         Int?
   submittedAt   DateTime?
   createdAt     DateTime  @default(now())
-
+  
   hackathon Hackathon    @relation(fields: [hackathonId], references: [id])
   members   TeamMember[]
 
