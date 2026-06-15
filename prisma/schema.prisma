@@ -118,6 +118,7 @@ model Camp {
   venue       String?
   maxSeats    Int?
   tags        String[]
+  yearTarget  YearTarget @default(ALL)
   createdBy   String
   creator     User       @relation(fields: [createdBy], references: [id])
   createdAt   DateTime   @default(now())

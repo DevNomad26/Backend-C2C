@@ -5,6 +5,9 @@ import cookieParser from 'cookie-parser';
 import passport from './config/passport';
 import authRouter from './routes/auth'
 import sessionRouter from './routes/session';
+import contestRouter from './routes/contest';
+import campRouter from './routes/camp';
+
 const app = express();
 
 //middlewares (global)
@@ -15,6 +18,8 @@ app.use(passport.initialize());
 //routes
 app.use('/api/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
+app.use('/api/contests', contestRouter);
+app.use('/api/camps', campRouter);
 
 app.get('/health', async (_req, res) => {
   try { 
@@ -33,6 +38,20 @@ app.get('/health', async (_req, res) => {
   }
 });
 
-app.listen(env.PORT, () => {
-  console.log(`Server running on http://localhost:${env.PORT}`);
-});
+const startServer = async () => {
+  try {
+    // Test database connection before starting
+    await prisma.$queryRaw`SELECT 1`;
+    console.log('Database connected');
+
+    app.listen(env.PORT, () => {
+      console.log(`Server running on http://localhost:${env.PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to connect to database:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
+
