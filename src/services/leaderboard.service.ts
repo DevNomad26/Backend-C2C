@@ -1,6 +1,10 @@
 import prisma from '../config/db';
+import { redis } from '../config/redis';
 
-export const getLeaderboard = async (year?: number) => {
+const CACHE_TTL = 60; 
+
+// The expensive computation
+const computeLeaderboard = async (year?: number) => {
   const aggregated = await prisma.leaderboardEntry.groupBy({
     by: ['userId'],
     _sum: { score: true },
@@ -37,4 +41,23 @@ export const getLeaderboard = async (year?: number) => {
     rank: index + 1,
     ...entry,
   }));
+};
+
+
+export const getLeaderboard = async (year?: number) => {
+  const cacheKey = `leaderboard:year:${year ?? 'all'}`;
+
+  //try to get from cache
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  //cache miss - compute the expensive result
+  const leaderboard = await computeLeaderboard(year);
+
+  //store in cache with TTL
+  await redis.set(cacheKey, JSON.stringify(leaderboard), { EX: CACHE_TTL });
+
+  return leaderboard;
 };

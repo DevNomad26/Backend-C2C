@@ -12,7 +12,7 @@ import registrationRouter from './routes/registration';
 import teamRouter from './routes/team';
 import forumRouter from './routes/forum';
 import leaderboardRouter from './routes/leaderboard';
-
+import { connectRedis } from './config/redis';
 const app = express();
 
 //middlewares (global)
@@ -53,18 +53,18 @@ app.get('/health', async (_req, res) => {
 //server startup
 const startServer = async () => {
   try {
-    // Test database connection before starting
     await prisma.$queryRaw`SELECT 1`;
     console.log('Database connected');
+
+    await connectRedis();
 
     app.listen(env.PORT, () => {
       console.log(`Server running on http://localhost:${env.PORT}`);
     });
   } catch (error) {
-    console.error('Failed to connect to database:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
-};
+}
 
 startServer();
-
