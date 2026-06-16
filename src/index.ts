@@ -10,6 +10,7 @@ import campRouter from './routes/camp';
 import hackathonRouter from './routes/hackathon';
 import registrationRouter from './routes/registration';
 import teamRouter from './routes/team';
+import forumRouter from './routes/forum';
 
 const app = express();
 
@@ -26,7 +27,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/api/contests', contestRouter);
 app.use('/api/camps', campRouter);
+app.use('/api/forum', forumRouter);
 
+//few endponts
 app.get('/health', async (_req, res) => {
   try { 
     //just checks the connection works
@@ -44,6 +47,8 @@ app.get('/health', async (_req, res) => {
   }
 });
 
+
+//server startup
 const startServer = async () => {
   try {
     // Test database connection before starting
