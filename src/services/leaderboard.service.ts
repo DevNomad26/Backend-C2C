@@ -1,7 +1,7 @@
 import prisma from '../config/db';
 import { redis } from '../config/redis';
 
-const CACHE_TTL = 60; 
+const CACHE_TTL = 86400;
 
 // The expensive computation
 const computeLeaderboard = async (year?: number) => {
