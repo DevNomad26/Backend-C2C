@@ -11,6 +11,7 @@ import hackathonRouter from './routes/hackathon';
 import registrationRouter from './routes/registration';
 import teamRouter from './routes/team';
 import forumRouter from './routes/forum';
+import leaderboardRouter from './routes/leaderboard';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/sessions', sessionRouter);
 app.use('/api/contests', contestRouter);
 app.use('/api/camps', campRouter);
 app.use('/api/forum', forumRouter);
+app.use('/api/leaderboard', leaderboardRouter);
 
 //few endponts
 app.get('/health', async (_req, res) => {
