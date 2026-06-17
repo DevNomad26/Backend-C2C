@@ -13,6 +13,7 @@ import teamRouter from './routes/team';
 import forumRouter from './routes/forum';
 import leaderboardRouter from './routes/leaderboard';
 import { connectRedis } from './config/redis';
+import userRouter from './routes/user';
 const app = express();
 
 //middlewares (global)
@@ -30,6 +31,7 @@ app.use('/api/contests', contestRouter);
 app.use('/api/camps', campRouter);
 app.use('/api/forum', forumRouter);
 app.use('/api/leaderboard', leaderboardRouter);
+app.use('/api/users', userRouter);
 
 //few endponts
 app.get('/health', async (_req, res) => {
