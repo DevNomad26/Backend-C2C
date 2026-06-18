@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from '../utils/jwt';
 import * as campService from '../services/camp.service';
 import { z } from 'zod';
+import { invalidateCalendarCache } from '../services/calendar.service';
 
 const createCampSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -93,7 +94,7 @@ export const createCamp = async (req: Request, res: Response) => {
       endDate: new Date(parsed.data.endDate),
       createdBy: user.userId,
     });
-
+    await invalidateCalendarCache();
     res.status(201).json({ success: true, data: camp });
   } catch (error) {
     console.error('Create camp error:', error);
@@ -125,7 +126,7 @@ export const updateCamp = async (req: Request, res: Response) => {
       startDate: parsed.data.startDate ? new Date(parsed.data.startDate) : undefined,
       endDate: parsed.data.endDate ? new Date(parsed.data.endDate) : undefined,
     });
-
+    await invalidateCalendarCache();
     res.json({ success: true, data: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update camp' });
@@ -143,6 +144,7 @@ export const deleteCamp = async (req: Request, res: Response) => {
     }
 
     await campService.deleteCamp(id);
+    await invalidateCalendarCache();
     res.json({ success: true, message: 'Camp deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete camp' });

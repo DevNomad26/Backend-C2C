@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from '../utils/jwt';
 import * as sessionService from '../services/session.service';
 import { z } from 'zod';
-
+import { invalidateCalendarCache } from '../services/calendar.service';
 // Zod schema for creating a session
 const createSessionSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -82,7 +82,8 @@ export const updateSession = async (req: Request, res: Response) => {
       ...parsed.data,
       date: parsed.data.date ? new Date(parsed.data.date) : undefined,
     });
-
+    //invalidated the calendar cache as event changed
+    await invalidateCalendarCache();
     res.json({ success: true, data: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update session' });
@@ -109,6 +110,7 @@ export const deleteSession = async (req: Request, res: Response) => {
     }
 
     await sessionService.deleteSession(id);
+    await invalidateCalendarCache();
     res.json({ success: true, message: 'Session deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete session' });
@@ -135,7 +137,7 @@ export const createSession = async (req: Request, res: Response) => {
       date: new Date(parsed.data.date),
       createdBy: user.userId,
     });
-
+    await invalidateCalendarCache();
     res.status(201).json({ success: true, data: session });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to create session' });

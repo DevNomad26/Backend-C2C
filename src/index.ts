@@ -14,6 +14,8 @@ import forumRouter from './routes/forum';
 import leaderboardRouter from './routes/leaderboard';
 import { connectRedis } from './config/redis';
 import userRouter from './routes/user';
+import calendarRouter from './routes/calendar';
+
 const app = express();
 
 //middlewares (global)
@@ -32,6 +34,7 @@ app.use('/api/camps', campRouter);
 app.use('/api/forum', forumRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/users', userRouter);
+app.use('/api/calendar', calendarRouter);
 
 //few endponts
 app.get('/health', async (_req, res) => {

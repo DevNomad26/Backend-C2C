@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from '../utils/jwt';
 import * as contestService from '../services/contest.service';
 import { z } from 'zod';
-
+import { invalidateCalendarCache } from '../services/calendar.service';
 const createContestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
@@ -75,7 +75,7 @@ export const createContest = async (req: Request, res: Response) => {
       endTime: new Date(parsed.data.endTime),
       createdBy: user.userId,
     });
-
+    await invalidateCalendarCache();
     res.status(201).json({ success: true, data: contest });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to create contest' });
@@ -116,7 +116,7 @@ export const updateContest = async (req: Request, res: Response) => {
       startTime: parsed.data.startTime ? new Date(parsed.data.startTime) : undefined,
       endTime: parsed.data.endTime ? new Date(parsed.data.endTime) : undefined,
     });
-
+    await invalidateCalendarCache();
     res.json({ success: true, data: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update contest' });
@@ -144,6 +144,7 @@ export const deleteContest = async (req: Request, res: Response) => {
     }
 
     await contestService.deleteContest(id);
+    await invalidateCalendarCache();
     res.json({ success: true, message: 'Contest deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete contest' });

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from '../utils/jwt';
 import * as hackathonService from '../services/hackathon.service';
 import { z } from 'zod';
-
+import { invalidateCalendarCache } from '../services/calendar.service';
 const createHackathonSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
@@ -114,7 +114,7 @@ export const createHackathon = async (req: Request, res: Response) => {
       submissionDeadline: new Date(parsed.data.submissionDeadline),
       createdBy: user.userId,
     });
-
+    await invalidateCalendarCache();
     res.status(201).json({ success: true, data: hackathon });
   } catch (error) {
     console.error('Create hackathon error:', error);
@@ -148,7 +148,7 @@ export const updateHackathon = async (req: Request, res: Response) => {
         ? new Date(parsed.data.submissionDeadline)
         : undefined,
     });
-
+    await invalidateCalendarCache();
     res.json({ success: true, data: updated });
   } catch (error) {
     console.error('Update hackathon error:', error);
@@ -167,6 +167,7 @@ export const deleteHackathon = async (req: Request, res: Response) => {
     }
 
     await hackathonService.deleteHackathon(id);
+    await invalidateCalendarCache();
     res.json({ success: true, message: 'Hackathon deleted successfully' });
   } catch (error) {
     console.error('Delete hackathon error:', error);
