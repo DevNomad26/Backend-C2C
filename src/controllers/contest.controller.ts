@@ -7,10 +7,46 @@ const createContestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   hackerrankUrl: z.string().url('Invalid HackerRank URL'),
+  accessCode: z.string().optional(),
   startTime: z.string().datetime('Invalid start time'),
   endTime: z.string().datetime('Invalid end time'),
   yearTarget: z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'ALL']).default('ALL'),
 });
+
+const unlockSchema = z.object({
+  code: z.string().min(1, 'Access code is required'),
+});
+
+export const unlockContest = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const parsed = unlockSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, message: 'Access code is required' });
+    }
+
+    const contest = await contestService.getContestRaw(id);
+    if (!contest) {
+      return res.status(404).json({ success: false, message: 'Contest not found' });
+    }
+
+    // reuse the shared logic — ended or no code means link is open
+    if (contestService.shouldRevealLink(contest)) {
+      return res.json({ success: true, data: { hackerrankUrl: contest.hackerrankUrl } });
+    }
+
+    // otherwise it's gated — check the code
+    if (parsed.data.code !== contest.accessCode) {
+      return res.status(403).json({ success: false, message: 'Incorrect access code' });
+    }
+
+    res.json({ success: true, data: { hackerrankUrl: contest.hackerrankUrl } });
+  } catch (error) {
+    console.error('Unlock contest error:', error);
+    res.status(500).json({ success: false, message: 'Failed to unlock contest' });
+  }
+};
 
 const updateContestSchema = createContestSchema.partial();
 

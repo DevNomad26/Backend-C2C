@@ -7,7 +7,8 @@ const router = Router();
 // Public routes
 router.get('/', contestController.getAllContests);
 router.get('/:id', contestController.getContestById);
-
+//unlocking the link for contest
+router.post('/:id/unlock', authenticate, contestController.unlockContest);
 // Protected routes — seniors and admins only
 router.post('/', authenticate, requireSenior, contestController.createContest);
 router.patch('/:id', authenticate, requireSenior, contestController.updateContest);

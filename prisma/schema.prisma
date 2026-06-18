@@ -76,6 +76,7 @@ model Contest {
   title          String
   description    String
   hackerrankUrl  String
+  accessCode String?
   startTime      DateTime
   endTime        DateTime
   yearTarget     YearTarget @default(ALL)
