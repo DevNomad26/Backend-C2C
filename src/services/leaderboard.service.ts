@@ -3,6 +3,12 @@ import { redis } from '../config/redis';
 
 const CACHE_TTL = 86400;
 
+interface ScoreEntry {
+  hackerrankUsername: string;
+  score: number;
+  rank: number;
+}
+
 // The expensive computation
 const computeLeaderboard = async (year?: number) => {
   const aggregated = await prisma.leaderboardEntry.groupBy({
@@ -60,4 +66,64 @@ export const getLeaderboard = async (year?: number) => {
   await redis.set(cacheKey, JSON.stringify(leaderboard), { EX: CACHE_TTL });
 
   return leaderboard;
+};
+
+
+export const syncContestScores = async (
+  contestId: string,
+  entries: ScoreEntry[]
+) => {
+  let matched = 0;
+  let unmatched: string[] = [];
+
+  for (const entry of entries) {
+    // find the user with this hackerrank username
+    const user = await prisma.user.findUnique({
+      where: { hackerrankUsername: entry.hackerrankUsername },
+    });
+
+    if (!user) {
+      // this hackerrank user isn't a registered member - skip
+      unmatched.push(entry.hackerrankUsername);
+      continue;
+    }
+
+    //update if entry exists, create if not
+    await prisma.leaderboardEntry.upsert({
+      where: {
+        userId_contestId: { userId: user.id, contestId },
+      },
+      update: {
+        score: entry.score,
+        rank: entry.rank,
+        syncedAt: new Date(),
+      },
+      create: {
+        userId: user.id,
+        contestId,
+        score: entry.score,
+        rank: entry.rank,
+      },
+    });
+
+    matched++;
+  }
+
+  //invalidate all leaderboard caches since scores changed
+  await invalidateLeaderboardCache();
+
+  return {
+    totalFetched: entries.length,
+    matched,
+    unmatchedCount: unmatched.length,
+    unmatched,
+  };
+};
+
+//invalidate all leaderboard caches
+export const invalidateLeaderboardCache = async () => {
+  const keys = await redis.keys('leaderboard:*');
+  if (keys.length > 0) {
+    await redis.del(keys);
+  }
 };

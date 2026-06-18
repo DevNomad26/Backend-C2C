@@ -94,7 +94,7 @@ model LeaderboardEntry {
   id         String   @id @default(uuid())
   userId     String
   contestId  String
-  score      Int      @default(0)
+  score      Float      @default(0)
   rank       Int?
   syncedAt   DateTime @default(now())
 
