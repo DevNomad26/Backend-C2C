@@ -25,6 +25,7 @@ export const updateProfile = async (id: string, data: Partial<{
   phone: string;
   hackerrankUsername: string;
   bio: string;
+  avatarUrl: string;
   isProfileComplete: boolean;
 }>) => {
   return await prisma.user.update({

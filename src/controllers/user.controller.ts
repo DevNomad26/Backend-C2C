@@ -13,6 +13,11 @@ const updateRoleSchema = z.object({
   role: z.enum(['ADMIN', 'SENIOR', 'MEMBER']),
 });
 
+const updateAvatarSchema = z.object({
+  avatarUrl: z.string().url('Invalid image URL'),
+});
+
+
 // GET /api/users/me - own profile
 export const getMyProfile = async (req: Request, res: Response) => {
   try {
@@ -120,5 +125,28 @@ export const updateUserRole = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Update role error:', error);
     res.status(500).json({ success: false, message: 'Failed to update role' });
+  }
+};
+
+export const updateAvatar = async (req: Request, res: Response) => {
+  try {
+    const parsed = updateAvatarSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid image URL is required',
+      });
+    }
+
+    const user = req.user as unknown as JwtPayload;
+    const updated = await userService.updateProfile(user.userId, {
+      avatarUrl: parsed.data.avatarUrl,
+    });
+
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    console.error('Update avatar error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update avatar' });
   }
 };

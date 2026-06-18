@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/me', authenticate, userController.getMyProfile);
 router.patch('/profile', authenticate, userController.updateProfile);
-
+router.patch('/avatar', authenticate, userController.updateAvatar);
 // Admin only
 router.get('/', authenticate, requireAdmin, userController.getAllUsers);
 router.patch('/:id/role', authenticate, requireAdmin, userController.updateUserRole);

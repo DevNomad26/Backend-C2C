@@ -16,6 +16,7 @@ import { connectRedis } from './config/redis';
 import userRouter from './routes/user';
 import calendarRouter from './routes/calendar';
 import syncRouter from './routes/sync';
+import uploadRouter from './routes/upload';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/users', userRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/sync', syncRouter);
+app.use('/api/uploads', uploadRouter);
 
 //few endponts
 app.get('/health', async (_req, res) => {
