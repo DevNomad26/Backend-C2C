@@ -27,7 +27,10 @@ const options: swaggerJSDoc.Options = {
     },
   },
   // where to look for JSDoc comments
-  apis: ['./src/routes/*.ts'],
+  apis: [
+  './src/routes/*.ts',   // local dev (ts-node-dev)
+  './dist/routes/*.js',  // production (compiled, in Docker)
+  ]
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
