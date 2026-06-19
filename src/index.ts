@@ -19,6 +19,7 @@ import syncRouter from './routes/sync';
 import uploadRouter from './routes/upload';
 import cors from 'cors';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { generalLimiter} from './middleware/rateLimiter';
 
 const app = express();
 
@@ -33,7 +34,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
-
+app.use('/api', generalLimiter);
 //routes
 
 app.use('/api/hackathons', hackathonRouter);
