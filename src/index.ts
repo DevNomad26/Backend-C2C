@@ -18,6 +18,7 @@ import calendarRouter from './routes/calendar';
 import syncRouter from './routes/sync';
 import uploadRouter from './routes/upload';
 import cors from 'cors';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 const app = express();
 
@@ -67,6 +68,9 @@ app.get('/health', async (_req, res) => {
   }
 });
 
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 //server startup
 const startServer = async () => {
