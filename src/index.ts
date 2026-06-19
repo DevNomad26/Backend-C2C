@@ -17,18 +17,27 @@ import userRouter from './routes/user';
 import calendarRouter from './routes/calendar';
 import syncRouter from './routes/sync';
 import uploadRouter from './routes/upload';
+import cors from 'cors';
 
 const app = express();
+
+app.use(
+  cors({
+    origin: env.FRONTEND_URL,   // list of allowed domains
+    credentials: true,           // allow cookies to be sent
+  })
+);
 
 //middlewares (global)
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
+
+//routes
+
 app.use('/api/hackathons', hackathonRouter);
 app.use('/api/registrations', registrationRouter);
 app.use('/api/hackathons/:hackathonId/teams', teamRouter);
-
-//routes
 app.use('/api/auth', authRouter);
 app.use('/api/sessions', sessionRouter);
 app.use('/api/contests', contestRouter);
