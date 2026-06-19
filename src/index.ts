@@ -20,6 +20,8 @@ import uploadRouter from './routes/upload';
 import cors from 'cors';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter} from './middleware/rateLimiter';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 
 const app = express();
 
@@ -50,6 +52,8 @@ app.use('/api/users', userRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/sync', syncRouter);
 app.use('/api/uploads', uploadRouter);
+//serve interactive api documentation
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //few endponts
 app.get('/health', async (_req, res) => {

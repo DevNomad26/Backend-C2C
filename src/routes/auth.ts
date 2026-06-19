@@ -5,7 +5,15 @@ import { env } from '../config/env';
 import prisma from '../config/db';
 const router = Router();
 
-//user hits this route, gets redirected to Google
+/**
+ * @openapi
+ * /api/auth/google:
+ *   get:
+ *     summary: Start Google OAuth login
+ *     tags: [Auth]
+ *     responses:
+ *       302: { description: Redirects to Google }
+ */
 router.get(
   '/google',
   passport.authenticate('google', {
@@ -14,7 +22,15 @@ router.get(
   })
 );
 
-//Google redirects back here after login
+/**
+ * @openapi
+ * /api/auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback - sets JWT cookie
+ *     tags: [Auth]
+ *     responses:
+ *       302: { description: Redirects to frontend with auth cookie set }
+ */
 router.get(
   '/google/callback',
   passport.authenticate('google', {
@@ -42,14 +58,33 @@ router.get(
   }
 );
 
-//logout endpoint
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     summary: Log out - clears the auth cookie
+ *     tags: [Auth]
+ *     responses:
+ *       200: { description: Logged out }
+ */
 router.post('/logout', (req, res) => {
   res.clearCookie('token');
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
 
-//getting jwt payload of logged in users
+/**
+ * @openapi
+ * /api/auth/me:
+ *   get:
+ *     summary: Get current logged-in user
+ *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200: { description: Current user }
+ *       401: { description: Not logged in }
+ */
 router.get('/me', async (req, res) => {
   const token = req.cookies?.token;
 
