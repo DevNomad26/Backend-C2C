@@ -161,7 +161,7 @@ Every endpoint is documented with its request/response shape, parameters, and au
 
 ## Performance
 
-The leaderboard endpoint runs an expensive aggregation across all contest scores. It was benchmarked naive (query-per-request) vs Redis-cached under load. See [BENCHMARKS.md](./BENCHMARKS.md) for the full methodology and results.
+The leaderboard endpoint runs an expensive aggregation across all contest scores. It was benchmarked naive (query-per-request) vs Redis-cached under load. See [BENCHMARKS.md](./Benchmarks.md) for the full methodology and results.
 
 ---
 
