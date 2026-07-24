@@ -21,7 +21,7 @@ passport.use(
         }
 
         // Step 2 - check college email domain
-        if (!email.endsWith(`@${env.ALLOWED_EMAIL_DOMAIN}`)) {
+        if (env.ALLOWED_EMAIL_DOMAIN !== '*' && !email.endsWith(`@${env.ALLOWED_EMAIL_DOMAIN}`)) {
           return done(new Error(`Only @${env.ALLOWED_EMAIL_DOMAIN} emails are allowed`));
         }
 
