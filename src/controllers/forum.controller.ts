@@ -23,7 +23,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
       Array.isArray(req.query.tag) ? req.query.tag[0] : req.query.tag
     ) as string | undefined;
 
-    const posts = await forumService.getAllPosts(tag);
+    const user = req.user as unknown as JwtPayload;
+    const posts = await forumService.getAllPosts(tag, user.userId);
     res.json({ success: true, data: posts });
   } catch (error) {
     console.error('Get posts error:', error);
@@ -35,7 +36,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
 export const getPostById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const post = await forumService.getPostById(id);
+    const user = req.user as unknown as JwtPayload;
+    const post = await forumService.getPostById(id, user.userId);
 
     if (!post || post.isDeleted) {
       return res.status(404).json({ success: false, message: 'Post not found' });

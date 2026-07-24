@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { JwtPayload } from '../utils/jwt';
 import * as hackathonService from '../services/hackathon.service';
+import * as registrationService from '../services/registration.service';
 import { z } from 'zod';
 import { invalidateCalendarCache } from '../services/calendar.service';
 const createHackathonSchema = z.object({
@@ -53,7 +54,19 @@ export const getHackathonById = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: 'Hackathon not found' });
     }
 
-    res.json({ success: true, data: hackathon });
+    let isRegistered = false;
+    if (user) {
+      const reg = await registrationService.getHackathonRegistration(user.userId, id);
+      isRegistered = !!reg;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        ...hackathon,
+        isRegistered,
+      },
+    });
   } catch (error) {
     console.error('Get hackathon error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch hackathon' });

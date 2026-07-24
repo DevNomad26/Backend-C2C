@@ -1,8 +1,8 @@
 import prisma from '../config/db';
 
 // get all posts (excluding soft-deleted), pinned first
-export const getAllPosts = async (tag?: string) => {
-  return await prisma.forumPost.findMany({
+export const getAllPosts = async (tag?: string, currentUserId?: string) => {
+  const posts = await prisma.forumPost.findMany({
     where: {
       isDeleted: false,
       ...(tag ? { tags: { has: tag } } : {}),
@@ -14,17 +14,32 @@ export const getAllPosts = async (tag?: string) => {
       _count: {
         select: { comments: true, upvotes: true },
       },
+      upvotes: currentUserId
+        ? {
+            where: { userId: currentUserId },
+            select: { id: true },
+          }
+        : false,
     },
     orderBy: [
       { isPinned: 'desc' },
       { createdAt: 'desc' },
     ],
   });
+
+  return posts.map((post) => {
+    const hasUpvoted = currentUserId ? ((post.upvotes?.length || 0) > 0) : false;
+    const { upvotes, ...rest } = post as any;
+    return {
+      ...rest,
+      hasUpvoted,
+    };
+  });
 };
 
 //get a single post with its comments
-export const getPostById = async (id: string) => {
-  return await prisma.forumPost.findUnique({
+export const getPostById = async (id: string, currentUserId?: string) => {
+  const post = await prisma.forumPost.findUnique({
     where: { id },
     include: {
       author: {
@@ -42,8 +57,23 @@ export const getPostById = async (id: string) => {
       _count: {
         select: { upvotes: true },
       },
+      upvotes: currentUserId
+        ? {
+            where: { userId: currentUserId },
+            select: { id: true },
+          }
+        : false,
     },
   });
+
+  if (!post) return null;
+
+  const hasUpvoted = currentUserId ? ((post.upvotes?.length || 0) > 0) : false;
+  const { upvotes, ...rest } = post as any;
+  return {
+    ...rest,
+    hasUpvoted,
+  };
 };
 
 export const createPost = async (data: {

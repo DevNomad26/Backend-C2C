@@ -96,7 +96,7 @@ export const getHackathonForAdmin = async (id: string, includeRegistrations = fa
           members: {
             include: {
               user: {
-                select: { id: true, name: true, avatarUrl: true, email: true },
+                select: { id: true, name: true, avatarUrl: true, email: true, year: true, phone: true },
               },
             },
           },

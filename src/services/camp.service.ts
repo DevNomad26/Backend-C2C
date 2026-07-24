@@ -9,6 +9,9 @@ export const getAllCamps = async (yearTarget?: string) => {
       creator: {
         select: { id: true, name: true, avatarUrl: true },
       },
+      _count: {
+        select: { registrations: true },
+      },
     },
     orderBy: { startDate: 'desc' },
   });
@@ -20,6 +23,9 @@ export const getCampById = async (id: string, includeRegistrations = false) => {
     include: {
       creator: {
         select: { id: true, name: true, avatarUrl: true },
+      },
+      _count: {
+        select: { registrations: true },
       },
       registrations: includeRegistrations
         ? {
